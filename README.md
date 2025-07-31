@@ -4,7 +4,10 @@ A web-based application that visualizes complex debts and calculates the minimum
 
 **🚀 Live Demo Link:** [https://srisheph.github.io/cash-flow-minimizer/](https://srisheph.github.io/cash-flow-minimizer/)
 
-<img width="1920" height="861" alt="image" src="https://github.com/user-attachments/assets/780a1bf8-b4aa-4e3a-a9fa-65175d35b02d" />
+<img width="1920" height="869" alt="Screenshot 2025-07-31 231850" src="https://github.com/user-attachments/assets/98f7af13-71a1-4890-8f5c-f055fba768ba" />
+
+<img width="1920" height="867" alt="image" src="https://github.com/user-attachments/assets/55090a39-acfc-4036-b2ae-cbc5bd25567b" />
+
 
 
 ## Description
