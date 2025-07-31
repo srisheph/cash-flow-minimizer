@@ -3,6 +3,7 @@ const container = document.getElementById('graph-container');
 const form = document.getElementById('transaction-form');
 const transactionsList = document.getElementById('transactions-list');
 const simplifyBtn = document.getElementById('simplify-btn');
+const statusElement = document.getElementById('status');
 
 // Vis.js data structures
 const nodes = new vis.DataSet([]);
@@ -23,7 +24,17 @@ const network = new vis.Network(container, data, options);
 // Store transactions in an array
 let transactions = [];
 
-// --- 2. EVENT LISTENERS ---
+// --- 2. WEB ASSEMBLY INITIALIZATION ---
+var Module = {
+  onRuntimeInitialized: function() {
+    console.log("WebAssembly module has been loaded.");
+    statusElement.textContent = "Ready!";
+    simplifyBtn.disabled = false;
+    simplifyBtn.textContent = "Simplify Debts";
+  }
+};
+
+// --- 3. EVENT LISTENERS ---
 form.addEventListener('submit', function (event) {
     event.preventDefault();
     const payerName = document.getElementById('payer').value.trim();
@@ -65,6 +76,7 @@ simplifyBtn.addEventListener('click', () => {
     
     for (const t of result_parts) {
         const [debtor, creditor, amount] = t.split(',');
+        // For simplified transactions, the "payer" is the debtor
         simplified_transactions.push({ payer: debtor, payee: creditor, amount: amount });
         const listItem = document.createElement('li');
         listItem.textContent = `➡️ ${debtor} pays ${amount} to ${creditor}`;
@@ -75,16 +87,25 @@ simplifyBtn.addEventListener('click', () => {
     simplifyBtn.textContent = "Reset";
 });
 
-// --- 3. HELPER FUNCTIONS ---
+// --- 4. HELPER FUNCTIONS ---
 function updateGraph(transactionList, isSimplified = false) {
     const people = new Set();
     transactionList.forEach(t => { people.add(t.payer); people.add(t.payee); });
     nodes.clear();
     edges.clear();
     people.forEach(p => nodes.add({ id: p, label: p }));
+    
     transactionList.forEach(t => {
+        // *** THIS IS THE FIX ***
+        // If it's an initial transaction, the payee owes the payer. Arrow: payee -> payer
+        // If it's a simplified transaction, the debtor (t.payer) pays the creditor (t.payee). Arrow: payer -> payee
+        const fromNode = isSimplified ? t.payer : t.payee;
+        const toNode   = isSimplified ? t.payee : t.payer;
+
         edges.add({
-            from: t.payer, to: t.payee, label: String(t.amount),
+            from: fromNode, 
+            to: toNode, 
+            label: String(t.amount),
             color: isSimplified ? '#E53E3E' : '#4CAF50',
             width: isSimplified ? 3 : 2
         });
